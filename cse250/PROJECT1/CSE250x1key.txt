@@ -1,0 +1,97 @@
+CSE250                   Prelim I Answer Key                 Spring 2014
+
+
+(1) Consider these declarations-cum-definitions:
+
+string a = "They call me ";
+const string* apcd = new string("Yellow");
+string* const acp = new string(*apcd);
+string* ap = acp;
+
+(i) apcd->at(0) = 'M'; is illegal: pointer to constant data.
+acp->at(0) = 'M'; is legal since a constant pointer allows modifying data.
+
+(ii)
+After the change, ap is still pointing to the same place as acp,
+since only the data underneath changed.  So *ap = "Mellow " now.  Thus
+
+cout << a << *acp << *ap << endl; prints "They call me Mellow Mellow "
+
+Meanwhile, *because* apcd wasn't involved, it still points to "Yellow ", so
+
+cout << a << *acp << *apcd<<endl; prints "They call me Mellow Yellow "
+
+(iii) The copying is done in the line
+string* const acp = new string(*apcd);
+In fact, the copy constructor for the built-in "string" class is called. 
+
+(iv) Possibly erroneous lines:
+
+(a) a.at(0) = 'W';   //fine---"at" can be called by-value like any method.
+(b) ap->at(0) = 'H'; //or by-pointer like any method.
+
+(c) apcd = new string("Bellow");  //legal, because the new string means
+                                  //changing the *address value of* apcd,
+                                  //which is OK.  The old data "Yellow"
+                                  //wasn't changed.
+(d) //acp = &a;      //Can't change address value of constant pointer though
+(e) //ap = a;        //C++ does not allow a (non-int) value assigned to ptr.
+
+
+Bonus: The difference between (*ap)[-1] = 'Q'; and ap->at(-1) = 'Q';
+is the the latter throws a range-error (and aborts if you don't catch),
+while operator[] silently allows corrupting adjacent out-of-range memory.
+
+
+(2)
+(i)   (a) executes the loop body n times.
+      (b) executes the body (n/2)*(n/2) = n^2/4 times.
+
+(ii)  (a) When body is a Theta(m)-time procedure, m=0 to n-1, overall time is
+          quadratic, i.e. Theta(n^2).  This == what happens with isAscending()
+          on Assgt. 3, per the exam-prep notes about it that were posted.
+      (b) Theta(n^3), i.e. cubic time.  The easiest way to see this is that
+          on half of the titerations, j - i is >= n/2, so the overall time
+          is at least (1/2)(n/2)(n/2)*(time to sum n/2 items) = Theta(n^3).
+(iii) (d) is like the "smart Fibonacci" recursion---it recurses n/2 times
+          and stops.  The time for the base statement is "O(1)" since n=1,
+          but even if it were O(n) you'd still have n/2 recursions + O(n) time
+          = Theta(n) overall time
+(iv)  Item (c) is the regular "dumb" Fibonacci recursion, as in Ch. 7, and
+      takes exponential time.  (About (golden-ratio)^n time, in fact).
+      So it is vastly more time asymptotically than cubic.  Overall:
+      (d) < (a) < (b) < (c) where "f < g" means f = o(g) via Little-Oh, since
+      n = o(n^2) = o(n^3) = o(exponential).
+
+
+
+
+(3)
+Answer written in a way to use for Project 1:
+
+/** True if switching 2 adjacent unequal letters in x leaves y.
+ */
+bool transpose(const string& x, const string& y) {
+   if (x.length() != y.length()) { return false; } //test length > 1 not needed
+   // else
+   int xlenm1 = x.length() - 1;
+   for (int i = 0; i < xlenm1; i++) {
+      if (x[i] != y[i]) {   //mismatch means transposition must be here; if
+                            //rest of strings aren't equal, return false.
+         if (x[i] == y[i+1] && x[i+1] == y[i]  //&& x[i] != x[i+1] //not needed
+                  && x.substr(i+2) == y.substr(i+2)) {
+            cout << "transpose relevant for x = " << x << ", y = " << y << endl;
+            return true;    //^^^
+         } else {           //^^^Extra screen feedback good for Assgt. 7; we
+            return false;   //could just return the "if" clause & save 6 lines
+         }
+      }
+   } //control here means x == y  OR  mismatch in last char only; either way:
+   return false;
+}
+/** Damerau's distance-one criterion, meaning typo correctable by 1 local edit.
+ */
+bool dd1(const string& x, const string& y) {
+   return ed1(x,y) || transpose(x,y);
+}
+

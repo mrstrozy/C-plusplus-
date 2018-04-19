@@ -1,0 +1,4 @@
+
+
+
+For me(Matt Strozyk), I did the movie base the way that I did because I didn't have as much time as I wanted to be able to do it as efficiently. With this, I just made a couple vectors as it was the easiest thing to do and I fully understand how they work. I decided to make a movie base and a movie and genre class. This made it easier to match up id's of genre's and movies in order to find all the different characteristics of each.
